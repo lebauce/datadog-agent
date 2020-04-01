@@ -1,8 +1,9 @@
-package ebpf
+package network
 
 import (
-	"github.com/DataDog/datadog-agent/pkg/process/util"
 	"sync"
+
+	"github.com/DataDog/datadog-agent/pkg/process/util"
 )
 
 type dnsStats struct {

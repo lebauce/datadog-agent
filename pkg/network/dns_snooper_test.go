@@ -1,28 +1,33 @@
 // +build linux_bpf
 
-package ebpf
+package network
 
 import (
-	bpflib "github.com/iovisor/gobpf/elf"
 	"math/rand"
 	"net"
 	"testing"
 	"time"
 
+	bpflib "github.com/iovisor/gobpf/elf"
+
+	"github.com/DataDog/datadog-agent/pkg/ebpf/bytecode"
 	"github.com/DataDog/datadog-agent/pkg/process/util"
 	mdns "github.com/miekg/dns"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func getSnooper(t *testing.T, m *bpflib.Module) *SocketFilterSnooper {
-	cfg := NewDefaultConfig()
-	return getSnooperWithConfig(t, m, cfg)
-}
-
-func getSnooperWithConfig(t *testing.T, m *bpflib.Module, cfg *Config) *SocketFilterSnooper {
+func getSnooper(t *testing.T, m *bpflib.Module, collectStats, collectLocalDNS bool) *SocketFilterSnooper {
 	// Load socket filter
-	err := m.Load(SectionsFromConfig(cfg, true))
+	params := map[string]bpflib.SectionParams{
+		"socket/dns_filter":      {},
+		"maps/conn_stats":        {MapMaxEntries: 1024},
+		"maps/tcp_stats":         {MapMaxEntries: 1024},
+		"maps/tcp_close_events":  {MapMaxEntries: 1024},
+		"maps/port_bindings":     {MapMaxEntries: 1024},
+		"maps/udp_port_bindings": {MapMaxEntries: 1024},
+	}
+	err := m.Load(params)
 	require.NoError(t, err)
 
 	filter := m.SocketFilter("socket/dns_filter")
@@ -31,8 +36,8 @@ func getSnooperWithConfig(t *testing.T, m *bpflib.Module, cfg *Config) *SocketFi
 	reverseDNS, err := NewSocketFilterSnooper(
 		"/proc",
 		filter,
-		cfg.CollectDNSStats,
-		cfg.CollectLocalDNS,
+		collectStats,
+		collectLocalDNS,
 	)
 	require.NoError(t, err)
 	return reverseDNS
@@ -70,11 +75,11 @@ Loop:
 }
 
 func TestDNSOverUDPSnooping(t *testing.T) {
-	m, err := readBPFModule(false)
+	m, err := bytecode.ReadBPFModule(false)
 	require.NoError(t, err)
 	defer m.Close()
 
-	reverseDNS := getSnooper(t, m)
+	reverseDNS := getSnooper(t, m, false, false)
 	defer reverseDNS.Close()
 
 	// Connect to golang.org. This will result in a DNS lookup which will be captured by SocketFilterSnooper
@@ -99,13 +104,11 @@ func getOutboundIP(t *testing.T, serverIP string) net.IP {
 }
 
 func TestDNSOverTCPSnooping(t *testing.T) {
-	m, err := readBPFModule(false)
+	m, err := bytecode.ReadBPFModule(false)
 	require.NoError(t, err)
 	defer m.Close()
 
-	cfg := NewDefaultConfig()
-	cfg.CollectDNSStats = true
-	reverseDNS := getSnooperWithConfig(t, m, cfg)
+	reverseDNS := getSnooper(t, m, true, false)
 	defer reverseDNS.Close()
 
 	// Create a DNS query message
@@ -151,11 +154,11 @@ func TestDNSOverTCPSnooping(t *testing.T) {
 }
 
 func TestParsingError(t *testing.T) {
-	m, err := readBPFModule(false)
+	m, err := bytecode.ReadBPFModule(false)
 	require.NoError(t, err)
 	defer m.Close()
 
-	reverseDNS := getSnooper(t, m)
+	reverseDNS := getSnooper(t, m, false, false)
 	defer reverseDNS.Close()
 
 	// Pass a byte array of size 1 which should result in parsing error

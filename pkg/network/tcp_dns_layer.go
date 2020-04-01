@@ -1,9 +1,10 @@
 // +build linux_bpf
 
-package ebpf
+package network
 
 import (
 	"encoding/binary"
+
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
 )
