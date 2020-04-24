@@ -69,6 +69,12 @@ struct dentry_cache_t {
 };
 BPF_HASH(dentry_cache, u64, struct dentry_cache_t, 1000);
 
+typedef struct process_discriminator_t {
+    char comm[TASK_COMM_LEN];
+} process_discriminator;
+
+BPF_HASH(process_discriminators, process_discriminator, u8, 256);
+
 static u64 fill_process_data(struct process_data_t *data) {
     // Process data
     struct task_struct *task = (struct task_struct *)bpf_get_current_task();
@@ -99,66 +105,16 @@ struct path_leaf_t {
 };
 BPF_HASH(pathnames, u32, struct path_leaf_t, 63000);
 
-// Filter settings
-BPF_HASH(filter_settings, u8, u8, 1);
+static inline int filter_process() {
+    process_discriminator current_process;
+    bpf_get_current_comm(&current_process.comm, sizeof(current_process.comm));
 
-#define FILTER_PID          1 << 0
-#define FILTER_PID_NEG      1 << 1
-#define FILTER_PIDNS        1 << 2
-#define FILTER_PIDNS_NEG    1 << 3
-#define FILTER_TTY          1 << 4
-#define FILTER_SETTINGS_KEY 1
-#define IGNORE 0
-#define KEEP 1
-
-// Generic filters
-BPF_HASH(pid_filter, u32, u8);
-BPF_HASH(pidns_filter, u64, u8);
-
-static inline int filter_pid(u32 pid, u8 flag) {
-    u8 *f = pid_filter.lookup(&pid);
-    if (!f)
-        return (flag == FILTER_PID_NEG);
-    if (*f == IGNORE)
-        return 0;
-    return 1;
-}
-
-static inline int filter_pidns(u64 pidns, u8 flag) {
-    u8 *f = pidns_filter.lookup(&pidns);
-    if (!f)
-        return (flag == FILTER_PIDNS_NEG);
-    if (*f == IGNORE)
-        return 0;
-    return 1;
+    u8 *found = process_discriminators.lookup(&current_process);
+    return found == 0;
 }
 
 static inline int filter(struct process_data_t *data) {
-    // Check what filters are activated;
-    u8 key = FILTER_SETTINGS_KEY;
-    u8 *settings = filter_settings.lookup(&key);
-    if (!settings || *settings == 0) {
-	    return 1;
-    }
-    int keep = 1;
-    if ((*settings & FILTER_PIDNS) == FILTER_PIDNS) {
-		keep &= filter_pidns(data->pidns, FILTER_PIDNS);
-    }
-    if ((*settings & FILTER_PIDNS_NEG) == FILTER_PIDNS_NEG) {
-		keep &= filter_pidns(data->pidns, FILTER_PIDNS_NEG);
-    }
-    if ((*settings & FILTER_PID) == FILTER_PID) {
-		keep &= filter_pid(data->pid, FILTER_PID);
-    }
-    if ((*settings & FILTER_PID_NEG) == FILTER_PID_NEG) {
-		keep &= filter_pid(data->pid, FILTER_PID_NEG);
-    }
-    if ((*settings & FILTER_TTY) == FILTER_TTY) {
-        if (data->tty_name[0] == 0) {
-            keep = 0;
-        }
-    }
-    return keep;
+    return filter_process();
 }
 
 #define DENTRY_MAX_DEPTH 74

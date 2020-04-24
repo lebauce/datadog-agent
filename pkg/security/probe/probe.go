@@ -1,7 +1,12 @@
 package probe
 
 import (
+	"bytes"
+	"encoding/binary"
+	"log"
+
 	ebpf "github.com/DataDog/datadog-agent/pkg/ebpf/probe"
+	"github.com/iovisor/gobpf/bcc"
 )
 
 type EventHandler interface {
@@ -19,11 +24,8 @@ func NewProbe(handler EventHandler) (*Probe, error) {
 	p.Probe = &ebpf.Probe{
 		Source: source,
 		Tables: map[string]*ebpf.Table{
-			"pathnames":       &ebpf.Table{},
-			"process_filter":  &ebpf.Table{},
-			"filter_settings": &ebpf.Table{},
-			"pid_filter":      &ebpf.Table{},
-			"pidns_filter":    &ebpf.Table{},
+			"pathnames":              &ebpf.Table{},
+			"process_discriminators": &ebpf.Table{},
 		},
 		Hooks: []ebpf.Hook{
 			&ebpf.KProbe{
@@ -93,4 +95,32 @@ func NewProbe(handler EventHandler) (*Probe, error) {
 
 func (p *Probe) DispatchEvent(event interface{}) {
 	p.handler.HandleEvent(event)
+}
+
+func (p *Probe) PushProcessDiscriminator(name string) {
+	buffer := new(bytes.Buffer)
+	table := p.Tables["process_discriminators"]
+	if err := binary.Write(buffer, bcc.GetHostByteOrder(), []byte(name)); err != nil {
+		panic(err)
+	}
+	rep := make([]byte, 16)
+	copy(rep, buffer.Bytes())
+	table.Set(rep, []byte{1})
+
+	p.dumpDiscriminators()
+}
+
+func (p *Probe) dumpDiscriminators() {
+	var discriminator struct {
+		Key   [16]byte
+		Value uint8
+	}
+
+	discriminators := p.Tables["process_discriminators"]
+	iterator := discriminators.Iter()
+	for iterator.Next() {
+		binary.Read(bytes.NewBuffer(iterator.Key()), bcc.GetHostByteOrder(), &discriminator.Key)
+		binary.Read(bytes.NewBuffer(iterator.Leaf()), bcc.GetHostByteOrder(), &discriminator.Value)
+		log.Printf("Discriminator: %v => %v\n", discriminator.Key, discriminator.Value)
+	}
 }
