@@ -219,8 +219,9 @@
 
 [[constraint]]
   name = "github.com/iovisor/gobpf"
-  source = "github.com/DataDog/gobpf"
-  revision = "6763fd92fd3f414961878bfc5d7a9e1ebcd360d8"
+  # source = "github.com/DataDog/gobpf"
+  # revision = "6763fd92fd3f414961878bfc5d7a9e1ebcd360d8"
+  revision = "f0a208deaea5b01ea6425cdf29199638989f16f5"
 
 [[constraint]]
   name = "github.com/florianl/go-conntrack"

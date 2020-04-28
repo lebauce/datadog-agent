@@ -37,12 +37,12 @@ type Module struct {
 	Name      string
 	PkgPrefix string
 	BuildTags []string
-	Fields    map[string]*field
+	Fields    map[string]*structField
 }
 
 var module *Module
 
-type field struct {
+type structField struct {
 	Name    string
 	Type    string
 	IsArray bool
@@ -50,14 +50,14 @@ type field struct {
 	Tags    string
 }
 
-func (f *field) ElemType() string {
+func (f *structField) ElemType() string {
 	return strings.TrimLeft(f.Type, "[]")
 }
 
 type accessor struct {
 	Name    string
 	IsArray bool
-	Fields  []field
+	Fields  []structField
 }
 
 func (g *accessor) Has(kind string) bool {
@@ -82,7 +82,7 @@ func handleBasic(name, alias, kind string, tags string) {
 
 	switch kind {
 	case "int", "int8", "int16", "int32", "int64", "uint", "uint8", "uint16", "uint32", "uint64":
-		module.Fields[alias] = &field{Name: name, Type: "int", Public: true}
+		module.Fields[alias] = &structField{Name: name, Type: "int", Public: true}
 	default:
 		public := false
 		firstChar := strings.TrimPrefix(kind, "[]")
@@ -92,7 +92,7 @@ func handleBasic(name, alias, kind string, tags string) {
 		if unicode.IsUpper(rune(firstChar[0])) {
 			public = true
 		}
-		module.Fields[alias] = &field{
+		module.Fields[alias] = &structField{
 			Name:    name,
 			Type:    kind,
 			IsArray: strings.HasPrefix(kind, "[]"),
@@ -160,10 +160,21 @@ func handleSpec(astFile *ast.File, spec interface{}, prefix, aliasPrefix string)
 					}
 
 					if fieldTag, found := tag.Lookup("field"); found {
-						if fieldTag == "-" {
+						split := strings.SplitN(fieldTag, ",", 2)
+
+						if fieldAlias = split[0]; fieldAlias == "-" {
 							continue FIELD
 						}
-						fieldAlias = fieldTag
+
+						if len(split) > 1 {
+							module.Fields[fieldAlias] = &structField{
+								Name:   split[1],
+								Type:   "string",
+								Public: true,
+								Tags:   tags,
+							}
+							continue
+						}
 					}
 
 					if fieldType, ok := field.Type.(*ast.Ident); ok {
@@ -188,11 +199,13 @@ func handleSpec(astFile *ast.File, spec interface{}, prefix, aliasPrefix string)
 					// Embedded field
 					ident, _ := field.Type.(*ast.Ident)
 					if starExpr, ok := field.Type.(*ast.StarExpr); ident == nil && ok {
-						ident, _ = starExpr.X.(*ast.Ident)
+						ident, ok = starExpr.X.(*ast.Ident)
 					}
 
+					fmt.Printf("EMBEDDED MA GUEULE %s %v\n", ident.Name, ident)
 					if ident != nil {
 						embedded := astFile.Scope.Lookup(ident.Name)
+						fmt.Printf("POUET POUET %v\n", embedded)
 						if embedded != nil {
 							handleSpec(astFile, embedded.Decl, prefix, aliasPrefix)
 						}
@@ -246,7 +259,7 @@ func parseFile(filename string, pkgName string) (*Module, error) {
 		Name:      astFile.Name.Name,
 		PkgPrefix: pkgPrefix,
 		BuildTags: buildTags,
-		Fields:    make(map[string]*field),
+		Fields:    make(map[string]*structField),
 	}
 
 	for _, decl := range astFile.Decls {

@@ -46,11 +46,14 @@ func CreateSystemProbe(cfg *config.AgentConfig) (*SystemProbe, error) {
 
 	log.Infof("Creating tracer for: %s", filepath.Base(os.Args[0]))
 
-	t, err := ebpf.NewTracer(config.SysProbeConfigFromConfig(cfg))
-	if err != nil {
-		return nil, err
-	}
+	/*
+		t, err := ebpf.NewTracer(config.SysProbeConfigFromConfig(cfg))
+		if err != nil {
+			return nil, err
+		}
+	*/
 
+	var err error
 	var tqlt *ebpf.TCPQueueLengthTracer
 	if cfg.CheckIsEnabled("TCP queue length") {
 		log.Infof("Starting the TCP queue length tracer")
@@ -69,7 +72,7 @@ func CreateSystemProbe(cfg *config.AgentConfig) (*SystemProbe, error) {
 	}
 
 	return &SystemProbe{
-		tracer:               t,
+		// tracer:               t,
 		tcpQueueLengthTracer: tqlt,
 		cfg:                  cfg,
 		conn:                 conn,

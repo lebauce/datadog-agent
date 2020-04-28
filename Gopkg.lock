@@ -39,6 +39,26 @@
   revision = "bbe0f8da39b3c59d42217afcc79019c754dabdfb"
 
 [[projects]]
+  digest = "1:ce24f8f5a32e5d349aa62427c924fc1f9cd0c6640405bf601c1542b4d7230fc7"
+  name = "docker.io/go-docker"
+  packages = [
+    "api/types",
+    "api/types/blkiodev",
+    "api/types/container",
+    "api/types/filters",
+    "api/types/mount",
+    "api/types/network",
+    "api/types/registry",
+    "api/types/strslice",
+    "api/types/swarm",
+    "api/types/swarm/runtime",
+    "api/types/versions",
+  ]
+  pruneopts = ""
+  revision = "b3f5b5de7bbce0acc6a7fc0a4c2b88db678e262e"
+  version = "v1.0.0"
+
+[[projects]]
   digest = "1:f08073405b4cdb6347ac44fdd06c0df556c99c74e271b76e213d947ed1455aeb"
   name = "github.com/DataDog/agent-payload"
   packages = [
@@ -204,6 +224,19 @@
   pruneopts = ""
   revision = "cbe66965904dbe8a6cd589e2298e5d8b986bd7dd"
   version = "1.1.0"
+
+[[projects]]
+  digest = "1:6374cf354b78059217bee5f0fc510098338585254509b5fad0bd0193dbedbc4a"
+  name = "github.com/alecthomas/participle"
+  packages = [
+    ".",
+    "lexer",
+    "lexer/ebnf",
+    "lexer/ebnf/internal",
+  ]
+  pruneopts = ""
+  revision = "2852ba68d29e6662fce05eadbc12653443fa815c"
+  version = "v0.4.1"
 
 [[projects]]
   branch = "master"
@@ -503,7 +536,7 @@
   version = "v19.03.8"
 
 [[projects]]
-  digest = "1:ebe593d8b65a2947b78b6e164a2dac1a230b977a700b694da3a398b03b7afb04"
+  digest = "1:a5ecc2e70260a87aa263811281465a5effcfae8a54bac319cee87c4625f04d63"
   name = "github.com/docker/go-connections"
   packages = [
     "nat",
@@ -511,8 +544,8 @@
     "tlsconfig",
   ]
   pruneopts = ""
-  revision = "7395e3f8aa162843a74ed6d48e79627d9792ac55"
-  version = "v0.4.0"
+  revision = "3ede32e2033de7505e6500d6c868c2b9ed9f169d"
+  version = "v0.3.0"
 
 [[projects]]
   branch = "master"
@@ -523,12 +556,12 @@
   revision = "e31b211e4f1cd09aa76fe4ac244571fab96ae47f"
 
 [[projects]]
-  digest = "1:a8212495120c94f629a8cf5c9760c4017390e24ab8a049cf566dbd3f5627d6cb"
+  digest = "1:582d54fcb7233da8dde1dfd2210a5b9675d0685f84246a8d317b07d680c18b1b"
   name = "github.com/docker/go-units"
   packages = ["."]
   pruneopts = ""
-  revision = "519db1ee28dcc9fd2474ae59fca29a810482bfb1"
-  version = "v0.4.0"
+  revision = "47565b4f722fb6ceae66b95f853feed578a4a51c"
+  version = "v0.3.3"
 
 [[projects]]
   digest = "1:ba9a3ee3359edeeec2c6c1ddb6976db4b7ca6ad045e73b43471e32f01b5786e4"
@@ -898,7 +931,7 @@
   version = "v1.0"
 
 [[projects]]
-  digest = "1:d113f3f920e4f5eb7890b7cb131aef30f6362ea9efbc06e5a7ca9de668e904f7"
+  digest = "1:cba16b5aa46f0caaf2b743c389218c17bbf4ca9d5cddd1e80fcaa82e0a412a06"
   name = "github.com/iovisor/gobpf"
   packages = [
     "bcc",
@@ -907,8 +940,7 @@
     "pkg/cpuonline",
   ]
   pruneopts = ""
-  revision = "6763fd92fd3f414961878bfc5d7a9e1ebcd360d8"
-  source = "github.com/DataDog/gobpf"
+  revision = "f0a208deaea5b01ea6425cdf29199638989f16f5"
 
 [[projects]]
   digest = "1:6f49eae0c1e5dab1dafafee34b207aeb7a42303105960944828c2079b92fc88e"
@@ -1409,6 +1441,14 @@
   version = "v1.0.0"
 
 [[projects]]
+  digest = "1:66f68db2e67616956809231dabda0e3e7e3cd6bd9cc4d9886e74450d6679a75d"
+  name = "github.com/vipally/binary"
+  packages = ["."]
+  pruneopts = ""
+  revision = "aaffe641b004ebc721af189e454f4796cb7fee67"
+  version = "1.2.0"
+
+[[projects]]
   digest = "1:0b30de1a6957125af05f8dbe7dfe8843fb4aa0d87d803d3ebd83f39aed113c9a"
   name = "github.com/vishvananda/netns"
   packages = ["."]
@@ -1545,9 +1585,12 @@
   name = "golang.org/x/tools"
   packages = [
     "go/ast/astutil",
+    "go/buildutil",
     "go/gcexportdata",
+    "go/internal/cgo",
     "go/internal/gcimporter",
     "go/internal/packagesdriver",
+    "go/loader",
     "go/packages",
     "go/types/typeutil",
     "internal/packagesinternal",
@@ -2200,6 +2243,9 @@
     "code.cloudfoundry.org/bbs/events",
     "code.cloudfoundry.org/bbs/models",
     "code.cloudfoundry.org/lager",
+    "docker.io/go-docker/api/types",
+    "docker.io/go-docker/api/types/container",
+    "docker.io/go-docker/api/types/strslice",
     "github.com/DataDog/agent-payload/gogen",
     "github.com/DataDog/agent-payload/process",
     "github.com/DataDog/datadog-go/statsd",
@@ -2221,6 +2267,9 @@
     "github.com/DataDog/watermarkpodautoscaler/pkg/client/listers/datadoghq/v1alpha1",
     "github.com/DataDog/zstd.v1.3",
     "github.com/Microsoft/go-winio",
+    "github.com/alecthomas/participle",
+    "github.com/alecthomas/participle/lexer",
+    "github.com/alecthomas/participle/lexer/ebnf",
     "github.com/aws/aws-sdk-go/aws",
     "github.com/aws/aws-sdk-go/aws/credentials",
     "github.com/aws/aws-sdk-go/aws/session",
@@ -2244,6 +2293,7 @@
     "github.com/coreos/go-semver/semver",
     "github.com/coreos/go-systemd/dbus",
     "github.com/coreos/go-systemd/sdjournal",
+    "github.com/davecgh/go-spew/spew",
     "github.com/docker/docker/api/types",
     "github.com/docker/docker/api/types/container",
     "github.com/docker/docker/api/types/events",
@@ -2283,6 +2333,7 @@
     "github.com/mdlayher/netlink",
     "github.com/mholt/archiver",
     "github.com/miekg/dns",
+    "github.com/mitchellh/mapstructure",
     "github.com/openshift/api/quota/v1",
     "github.com/patrickmn/go-cache",
     "github.com/pkg/errors",
@@ -2307,6 +2358,7 @@
     "github.com/tinylib/msgp/msgp",
     "github.com/twmb/murmur3",
     "github.com/urfave/negroni",
+    "github.com/vipally/binary",
     "github.com/vishvananda/netns",
     "golang.org/x/mobile/asset",
     "golang.org/x/net/context",
@@ -2321,6 +2373,7 @@
     "golang.org/x/sys/windows/svc/mgr",
     "golang.org/x/text/unicode/norm",
     "golang.org/x/time/rate",
+    "golang.org/x/tools/go/loader",
     "google.golang.org/grpc",
     "gopkg.in/yaml.v2",
     "gopkg.in/zorkian/go-datadog-api.v2",

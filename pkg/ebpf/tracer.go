@@ -145,16 +145,18 @@ func NewTracer(config *Config) (*Tracer, error) {
 		probeName := KProbeName(k.Name)
 		if _, ok := enabledProbes[probeName]; ok {
 			// check if we should override kprobe name
+			/*
 			if override, ok := kprobeOverrides[probeName]; ok {
 				if err = m.SetKprobeForSection(string(probeName), string(override)); err != nil {
 					return nil, fmt.Errorf("could not update kprobe \"%s\" to \"%s\" : %s", k.Name, string(override), err)
 				}
 			}
+			*/
 
 			if isSysCall(probeName) {
 				fixedName := fixSyscallName(prefix, probeName)
 				log.Debugf("attaching section %s to %s", string(probeName), fixedName)
-				m.SetKprobeForSection(string(probeName), fixedName)
+				// m.SetKprobeForSection(string(probeName), fixedName)
 			}
 
 			if err = m.EnableKprobe(string(probeName), maxActive); err != nil {
@@ -711,7 +713,7 @@ func SectionsFromConfig(c *Config, enableSocketFilter bool) map[string]bpflib.Se
 			MapMaxEntries: 1024,
 		},
 		"socket/dns_filter": {
-			Disabled: !enableSocketFilter,
+			// Disabled: !enableSocketFilter,
 		},
 	}
 }

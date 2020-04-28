@@ -2,14 +2,9 @@ package probe
 
 import (
 	"C"
-
-	"time"
-	"unsafe"
-
-	"github.com/DataDog/datadog-agent/pkg/security/model"
 )
-import "log"
 
+/*
 // handleSecurityInodeSetattr - Handles a setattr update event
 func (p *Probe) handleSecurityInodeSetattr(data []byte) {
 	eventRaw := &model.SetAttrRaw{}
@@ -22,7 +17,7 @@ func (p *Probe) handleSecurityInodeSetattr(data []byte) {
 	event := model.SetAttrEvent{
 		EventBase: model.EventBase{
 			EventType: model.FileSetAttrEventType,
-			Timestamp: p.StartTime.Add(time.Duration(eventRaw.TimestampRaw) * time.Nanosecond),
+			Timestamp: p.StartTime().Add(time.Duration(eventRaw.TimestampRaw) * time.Nanosecond),
 		},
 		SetAttrRaw: eventRaw,
 		TTYName:    C.GoString((*C.char)(unsafe.Pointer(&eventRaw.TTYNameRaw))),
@@ -38,3 +33,4 @@ func (p *Probe) handleSecurityInodeSetattr(data []byte) {
 
 	// p.DispatchEvent(&event)
 }
+*/
