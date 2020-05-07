@@ -1,13 +1,13 @@
 package netlink
 
 import (
-	"bufio"
+	// "bufio"
 	"io"
 	"log"
 	"strings"
 
 	"github.com/DataDog/datadog-agent/pkg/config"
-	agentlog "github.com/DataDog/datadog-agent/pkg/util/log"
+	// agentlog "github.com/DataDog/datadog-agent/pkg/util/log"
 )
 
 // getLogger creates a log.Logger which forwards logs to the agent's logging package at DEBUG leve.
@@ -31,9 +31,9 @@ func getLogger() *log.Logger {
 }
 
 func forwardLogs(rd io.Reader) {
-	scanner := bufio.NewScanner(rd)
+	// scanner := bufio.NewScanner(rd)
 
-	for scanner.Scan() {
-		agentlog.Debugf("go-conntrack: %s", scanner.Text())
-	}
+	// for scanner.Scan() {
+	// 	agentlog.Debugf("go-conntrack: %s", scanner.Text())
+	// }
 }

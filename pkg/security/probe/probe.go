@@ -2,6 +2,7 @@ package probe
 
 import (
 	"bytes"
+	"io/ioutil"
 
 	"github.com/DataDog/datadog-agent/pkg/ebpf/gobpf"
 	eprobe "github.com/DataDog/datadog-agent/pkg/ebpf/probe"
@@ -23,7 +24,8 @@ type Probe struct {
 }
 
 func NewProbe(config *config.Config) (*Probe, error) {
-	bytecode, err := Asset("probe.o") // ioutil.ReadFile("pkg/security/ebpf/probe.o")
+	// bytecode, err := Asset("probe.o") // ioutil.ReadFile("pkg/security/ebpf/probe.o")
+	bytecode, err := ioutil.ReadFile("pkg/security/ebpf/probe.o")
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +48,7 @@ func NewProbe(config *config.Config) (*Probe, error) {
 				Name: "process_discriminators",
 			},
 			{
-				Name: "dentry_cache",
+				Name: "dentry_event_cache",
 			},
 		},
 		Kprobes: []*types.KProbe{
@@ -56,6 +58,34 @@ func NewProbe(config *config.Config) (*Probe, error) {
 				EntryEvent: "vfs_mkdir",
 				ExitFunc:   "kretprobe/security_inode_mkdir",
 				ExitEvent:  "vfs_mkdir",
+			},
+			&eprobe.KProbe{
+				Name:       "vfs_rmdir",
+				EntryFunc:  "kprobe/security_inode_rmdir",
+				EntryEvent: "vfs_rmdir",
+				ExitFunc:   "kretprobe/security_inode_rmdir",
+				ExitEvent:  "vfs_rmdir",
+			},
+			&eprobe.KProbe{
+				Name:       "vfs_rename",
+				EntryFunc:  "kprobe/security_inode_rename",
+				EntryEvent: "vfs_rename",
+				ExitFunc:   "kretprobe/security_inode_rename",
+				ExitEvent:  "vfs_rename",
+			},
+			&eprobe.KProbe{
+				Name:       "vfs_unlink",
+				EntryFunc:  "kprobe/security_inode_unlink",
+				EntryEvent: "vfs_unlink",
+				ExitFunc:   "kretprobe/security_inode_unlink",
+				ExitEvent:  "vfs_unlink",
+			},
+			&eprobe.KProbe{
+				Name:       "vfs_open",
+				EntryFunc:  "kprobe/security_file_open",
+				EntryEvent: "vfs_open",
+				ExitFunc:   "kretprobe/security_file_open",
+				ExitEvent:  "vfs_open",
 			},
 		},
 		PerfMaps: []*types.PerfMap{

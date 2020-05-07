@@ -66,7 +66,7 @@ def build(ctx, race=False, go_version=None, incremental_build=False, major_versi
         build_tags.append(BCC_TAG)
 
     # TODO static option
-    cmd = 'go build -mod={go_mod} {race_opt} {build_type} -tags "{go_build_tags}" '
+    cmd = 'go build {race_opt} {build_type} -tags "{go_build_tags}" '
     cmd += '-o {agent_bin} -gcflags="{gcflags}" -ldflags="{ldflags}" {REPO_PATH}/cmd/system-probe'
 
     args = {
@@ -261,7 +261,7 @@ def build_object_files(ctx, install=True):
         '-Wno-compare-distinct-pointer-types',
         '-Wunused',
         '-Wall',
-        '-Werror',
+        # '-Werror',
         '-O2',
         '-emit-llvm',
     ]

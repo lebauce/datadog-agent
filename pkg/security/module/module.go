@@ -14,6 +14,7 @@ import (
 	"github.com/DataDog/datadog-agent/pkg/security/policy"
 	"github.com/DataDog/datadog-agent/pkg/security/probe"
 	"github.com/DataDog/datadog-agent/pkg/security/secl/eval"
+	"github.com/DataDog/datadog-agent/pkg/util/log"
 )
 
 type Module struct {
@@ -41,6 +42,7 @@ func (a *Module) RuleMatch(rule *eval.Rule, event eval.Event) {
 }
 
 func (a *Module) DiscriminatorDiscovered(event eval.Event, field string) {
+	log.Debugf("Discriminator %s discovered", field)
 	a.probe.AddKernelFilter(event.(*probe.Event), field)
 }
 

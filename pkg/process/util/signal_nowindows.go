@@ -13,7 +13,7 @@ import (
 // HandleSignals tells us whether we should exit.
 func HandleSignals(exit chan bool) {
 	sigIn := make(chan os.Signal, 100)
-	signal.Notify(sigIn)
+	signal.Notify(sigIn, syscall.SIGINT, syscall.SIGTERM)
 	// unix only in all likelihood; but we don't care.
 	for sig := range sigIn {
 		switch sig {
