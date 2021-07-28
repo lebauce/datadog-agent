@@ -459,6 +459,11 @@ func (rs *RuleSet) AddPolicyVersion(filename string, version string) {
 	rs.loadedPolicies[strings.ReplaceAll(filename, ".", "_")] = version
 }
 
+// GetModel returns the model
+func (rs *RuleSet) GetModel() eval.Model {
+	return rs.model
+}
+
 // NewRuleSet returns a new ruleset for the specified data model
 func NewRuleSet(model eval.Model, eventCtor func() eval.Event, opts *Opts) *RuleSet {
 	return &RuleSet{
